@@ -1,24 +1,23 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import Controller from "./Components/Controller";
+import Header from "./Components/Header";
+import Modal from "./Components/Modal";
+import Provider from "./Components/Provider";
+import View from "./Components/View";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Provider>
+      <div className="bg-slate-100 h-screen overflow-hidden">
+        <Modal />
+
+        <div className="absolute top-0 w-full">
+          <Header />
+          <Controller />
+          <View />
+        </div>
+      </div>
+    </Provider>
   );
 }
 
