@@ -1,44 +1,12 @@
 import React, { useReducer } from "react";
-import { v4 } from "uuid";
 import { Context } from "./Context/Context";
 
 const initialState = {
   searchTerm: "",
   isOpenModal: false,
-  isCloseModal: true,
-  todos: [
-    {
-      id: v4(),
-      title: "Title 1",
-      desc: "Description 1",
-      isChangeText: false,
-      isChecked: false,
-      time: new Date(),
-    },
-    {
-      id: v4(),
-      title: "Title 1",
-      desc: "Description 1",
-      isChangeText: false,
-      isChecked: false,
-      time: new Date(),
-    },
-    {
-      id: v4(),
-      title: "Title 1",
-      desc: "Description 1",
-      isChangeText: false,
-      isChecked: false,
-      time: new Date(),
-    },
-  ],
-  isListView: true,
-  isTableView: false,
-  isAll: true,
-  isRunning: false,
-  isCompleted: false,
-  isCompletedListView: false,
-  isCompletedTableView: false,
+  todos: [],
+  view: 'list',
+  filter: 'all',
   isClearSelected: false,
   isClearCompleted: false,
   isReset: false,
@@ -51,6 +19,11 @@ const reducer = (state, action) => {
         ...state,
         todos: [action.value, ...state.todos],
       };
+    case "VIEW":
+      return {
+        ...state,
+        view: action.value
+      }
     case "CHECKED":
       return {
         ...state,
@@ -65,12 +38,10 @@ const reducer = (state, action) => {
       return {
         ...state,
         isOpenModal: true,
-        isCloseModal: false,
       };
     case "CLOSE_MODAL":
       return {
         ...state,
-        isCloseModal: true,
         isOpenModal: false,
       };
     case "SEARCH":
@@ -81,71 +52,39 @@ const reducer = (state, action) => {
     case "LIST":
       return {
         ...state,
-        isListView: true,
-        isCompletedListView: true,
-        isTableView: false,
+        view: action.value
       };
-    case "TABLE":
+    case "FILTER":
       return {
         ...state,
-        isTableView: true,
-        isCompletedTableView: true,
-        isCompletedListView: false,
-        isListView: false,
-      };
-    case "ALL":
-      return {
-        ...state,
-        isAll: true,
-        isRunning: false,
-        isCompleted: false,
-      };
-    case "RUNNING":
-      return {
-        ...state,
-        isRunning: true,
-        isAll: false,
-        isCompleted: false,
-      };
-    case "COMPLETED":
-      return {
-        ...state,
-        isCompleted: true,
-        isAll: false,
-        isRunning: false,
-      };
-    case "CLEAR_SELECTED":
+        filter: action.value
+    }
+    case "CLEAR_CHECKED":
       return {
         ...state,
         isClearSelected: true,
         todos: action.value,
         isClearCompleted: false,
-        isListView: true,
-        isTableView: false,
-        isAll: true,
-        isRunning: false,
-        isCompleted: false,
         isReset: false,
       };
     case "CLEAR_COMPLETED":
       return {
         ...state,
         isClearCompleted: true,
+        todos: action.value,
         isClearSelected: false,
         isReset: false,
       };
     case "RESET":
       return {
-        ...state,
-        isReset: true,
+        searchTerm: '',
+        isOpenModal: false,
+        view: 'list',
+        filter: 'all',
         todos: [],
-        isListView: true,
-        isTableView: false,
-        isAll: true,
-        isRunning: false,
-        isCompleted: false,
         isClearSelected: false,
         isClearCompleted: false,
+        isReset: true,
       };
     default:
       return state;
@@ -154,6 +93,32 @@ const reducer = (state, action) => {
 
 export default function Provider(props) {
   const [state, dispatch] = useReducer(reducer, initialState);
+
+  const handleSearchTerm = (state) => {
+    return state.todos.filter(todo => todo.title.toLowerCase().includes(state.searchTerm));
+  }
+  
+  const handleFilter = todos => {
+    if (state.filter === 'completed') {
+      return todos.filter(todo => todo.isCompleted);
+    } else if (state.filter === 'running') {
+      return todos.filter(todo => !todo.isCompleted);
+    }
+
+    return todos;
+  };
+
+  const handleChecked = (todoId) => {
+    let todos = [...state.todos];
+    const todo = todos.find(t => t.id === todoId);
+    todo.isChecked = !todo.isChecked;
+
+    dispatch({
+      type: "CHECKED",
+      value: todos
+    })
+  }
+
   const setState = ({ type, value }) => {
     dispatch({
       type,
@@ -161,42 +126,44 @@ export default function Provider(props) {
     });
   };
 
-  const handleChecked = (e) => {
-    const todos = state.todos.map((todo) => {
-      if (todo.id === e.target.id) {
-        todo.isChecked = !todo.isChecked;
-      }
-      return todo;
-    });
+  const clearChecked = () => {
+    const todos = state.todos.filter(todo => !todo.isChecked);
 
-    const clearTodos = state.todos.map(todo => {
-      if (todo.isChecked) {
-        
-      }
-    })
-
-    setState({
-      type: "CHECKED",
-      value: todos,
+    dispatch({
+      type: "CLEAR_CHECKED",
+      value: todos
     });
   };
 
-  const handleClick = (e) => {
-    const todos = state.todos.map((todo) => {
-      if (todo.id === e.target.id) {
-        todo.isChangeText = !todo.isChangeText;
-      }
-      return todo;
-    });
+  const  clearCompleted = () => {
+    const todos = state.todos.filter(todo => !todo.isCompleted);
 
-    setState({
+    dispatch({
+      type: "CLEAR_COMPLETED",
+      value: todos
+    });
+  }
+
+  const reset = () => {
+    dispatch({
+      type: "RESET",
+      value: []
+    });
+  };
+
+  const handleClick = todoId => {
+    const todos = [...state.todos];
+    const todo = state.todos.find(todo => todo.id === todoId);
+    todo.isCompleted = !todo.isCompleted;
+
+    dispatch({
       type: "STATUS",
       value: todos,
     });
   };
 
   return (
-    <Context.Provider value={{ state, setState, handleChecked, handleClick }}>
+    <Context.Provider value={{ state, setState, handleChecked, handleClick, handleSearchTerm, handleFilter, clearChecked, clearCompleted, reset }}>
       {props.children}
     </Context.Provider>
   );

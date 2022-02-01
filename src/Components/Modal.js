@@ -13,7 +13,7 @@ class SubModal extends Component {
     id: v4(),
     title: "",
     desc: "",
-    isChangeText: false,
+    isCompleted: false,
     isChecked: false,
     time: new Date(),
   };
@@ -21,7 +21,7 @@ class SubModal extends Component {
   onSubmit = (e, setState) => {
     e.preventDefault();
 
-    const { title, desc, id, isChecked, time, isChangeText } = this.state;
+    const { title, desc, id, isChecked, time, isCompleted } = this.state;
 
     setState({
       type: "CREATE_TODO",
@@ -29,7 +29,7 @@ class SubModal extends Component {
         id,
         title,
         desc,
-        isChangeText,
+        isCompleted,
         isChecked,
         time
       },

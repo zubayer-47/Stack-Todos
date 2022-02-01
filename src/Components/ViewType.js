@@ -8,8 +8,8 @@ export default function ViewType() {
     <div className="w-3/12 flex justify-center items-center gap-3">
       <p>
         <input
-          onChange={(e) => setState({ type: "LIST" })}
-          checked={state.isListView}
+          onChange={(e) => setState({ type: "VIEW", value: "list" })}
+          checked={state.view === 'list' ? true : false}
           type="radio"
           id="listView"
         />
@@ -17,8 +17,8 @@ export default function ViewType() {
       </p>
       <p>
         <input
-          onChange={(e) => setState({ type: "TABLE" })}
-          checked={state.isTableView}
+          onChange={(e) => setState({ type: "VIEW", value: "table" })}
+          checked={state.view === 'table' ? true : false}
           type="radio"
           id="tableView"
         />

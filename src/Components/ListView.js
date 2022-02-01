@@ -1,13 +1,13 @@
 import React, { useContext } from "react";
 import { Context } from "./Context/Context";
 
-export default function ListView() {
-  const { state, handleChecked, handleClick } = useContext(Context);
+export default function ListView({todos}) {
+  const { handleChecked, handleClick } = useContext(Context);
 
   return (
     <div className="max-w-4xl mx-auto border">
       <ul>
-        {state.todos.map((todo) => (
+        {todos.map((todo) => (
           <li
             key={todo.id}
             className="flex justify-between items-center p-3 border-b"
@@ -18,7 +18,7 @@ export default function ListView() {
                   type="checkbox"
                   checked={todo.isChecked}
                   id={todo.id}
-                  onChange={e => handleChecked(e)}
+                  onChange={e => handleChecked(e.target.id)}
                 />
                 <p className="text-lg">{todo.title}</p>
               </div>
@@ -29,14 +29,15 @@ export default function ListView() {
                 </p>
               </div>
             </div>
+
             <button
               className={`py-1 px-3 ${
-                !todo.isChangeText ? "bg-green-500" : "bg-red-500"
+                !todo.isCompleted ? "bg-green-500" : "bg-red-500"
               } text-slate-100 font-serif border-r rounded-sm focus:rounded-md`}
-              onClick={e => handleClick(e)}
               id={todo.id}
+              onClick={e => handleClick(e.target.id)}
             >
-              {!todo.isChangeText ? "Running" : "Completed"}
+              {!todo.isCompleted ? "Running" : "Completed"}
             </button>
           </li>
         ))}
